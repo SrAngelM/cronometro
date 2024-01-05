@@ -3,11 +3,13 @@ const startStopBtn = document.querySelector("#startStopBtn");
 const resetBtn = document.querySelector("#resetBtn");
 
 //Creo variables para el tiempo
+let microseconds=0;
 let seconds = 0;
 let minutes = 0;
 let hours = 0;
 
 //Creo varibles para los 0 izquierdos
+let leadingMicroseconds=0;
 let leadingSeconds = 0;
 let leadingMinutes = 0;
 let leadingHours = 0;
@@ -19,19 +21,29 @@ let timerStatus = "Stopped";
 //funcion del cronometro
 function stopWatch() {
   //Sumamos los segundos
-  seconds++;
+  microseconds++;
 
   //Establecemos las condicionales, en caso de que los segundos lleguen a 60, se tranformen en 0, el mismo caso aplica para los minutos.
-  if (seconds / 60 === 1) {
-    seconds = 0;
-    minutes++;
-    if (minutes / 60 === 1) {
-      minutes = 0;
-      hours++;
+  if(microseconds / 100 === 1){
+    microseconds=0;
+    seconds++;
+    if (seconds / 60 === 1) {
+      seconds = 0;
+      minutes++;
+      if (minutes / 60 === 1) {
+        minutes = 0;
+        hours++;
+      }
     }
   }
 
   //Aqui establecemos si los segundos es menos a 10, se agregue un 0 a la izquierda para evitar que se vea esteticamente solo 1 digito, el mismo caso aplica para los minutos y horas.
+  if(microseconds<10){
+    leadingMicroseconds="0"+microseconds.toString();
+  }else{
+    leadingMicroseconds=microseconds;
+  }
+
   if (seconds < 10) {
     leadingSeconds = "0" + seconds.toString();
   } else {
@@ -52,7 +64,7 @@ function stopWatch() {
 
   //Mostramos los minutos, segundos y horas.
   let displayTimer = (document.getElementById("timer").innerText =
-    leadingHours + ":" + leadingMinutes + ":" + leadingSeconds);
+    leadingHours + ":" + leadingMinutes + ":" + leadingSeconds+":"+leadingMicroseconds);
 }
 
 //Aniadimos al boton de inicio un evento
@@ -60,7 +72,7 @@ startStopBtn.addEventListener("click", () => {
   //Verificamos si el estado del tiempo esta parado para poder inciar el cronometro
   if (timerStatus === "stopped") {
     //Establecemos el intervalo de tiempo a que se sume 1 segundo en la vida real.
-    timerInterval = window.setInterval(stopWatch, 1000);
+    timerInterval = window.setInterval(stopWatch, 10);
     //Creamos el boton de pausa y lo reemplazamos por el de inicio
     document.getElementById(
       "startStopBtn"
@@ -83,8 +95,12 @@ startStopBtn.addEventListener("click", () => {
 //Creamos el evento del boton de reinicio, iniciando todas las variables en 0 y el cronometro se mostrara en 00:00:00
 resetBtn.addEventListener("click", () => {
   window.clearInterval(timerInterval);
+  document.getElementById(
+    "startStopBtn"
+  ).innerHTML = `<i class = "fa-solid fa-play" id = "play"></i>`;
+  timerStatus = "stopped";
   seconds = 0;
   minutes = 0;
   hours = 0;
-  document.getElementById("timer").innerHTML = "00:00:00";
+  document.getElementById("timer").innerHTML = "00:00:00:00";
 });
